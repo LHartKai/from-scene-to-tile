@@ -2,8 +2,8 @@
   "FROM_SCENE_TO_TILE": {
     "Title": "From Scene to Tile",
     "Controls": {
-      "StartCapture": "Recortar polígono do fundo como Tile",
-      "StartCaptureHint": "Desenhe um polígono livre sobre o fundo da cena para criar um Tile transparente.",
+      "StartCapture": "Iniciar Seleção",
+      "StartCaptureHint": "Inicia a seleção de área",
       "AddVertex": "Adicionar vértice na posição do cursor",
       "AddVertexHint": "Adicionar um vértice na posição atual do cursor durante o recorte.",
       "FinishCapture": "Concluir recorte poligonal",
