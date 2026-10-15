@@ -10,12 +10,18 @@
       "OutputFolder": {
         "Name": "Output folder",
         "Hint": "Data-source-relative folder where generated PNG files will be uploaded."
+      },
+      "OutputFormat": {
+        "Name": "Output image format",
+        "Hint": "Choose the file format used for newly created Tiles.",
+        "PNG": "PNG",
+        "WebP": "WebP"
       }
     },
     "Messages": {
       "Instructions": "Click to add polygon vertices. Click the first point, press Enter, or right-click to finish. Backspace removes a point; Esc cancels.",
       "Cancelled": "Polygon capture cancelled.",
-      "Success": "Transparent PNG uploaded and Tile created."
+      "Success": "Transparent image uploaded and Tile created."
     },
     "Errors": {
       "GMOnly": "Only a GM can use this tool.",
