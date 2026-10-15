@@ -38,6 +38,10 @@
         "Left": "Esquerdo",
         "Middle": "Central",
         "Right": "Direito"
+      },
+      "UndoMouseButton": {
+        "Name": "Botão do mouse para remover vértice",
+        "Hint": "Clique para remover o último vértice adicionado durante o recorte."
       }
     },
     "Messages": {
