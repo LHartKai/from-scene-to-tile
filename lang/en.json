@@ -17,7 +17,8 @@
     "Settings": {
       "OutputFolder": {
         "Name": "Output folder",
-        "Hint": "Choose the destination folder using Foundry's file picker. Generated images will be saved there."
+        "Hint": "Choose the destination folder using Foundry's file picker. Generated images will be saved there.",
+        "PickerHint": "Open the folder browser to choose the destination."
       },
       "OutputFormat": {
         "Name": "Output image format",
