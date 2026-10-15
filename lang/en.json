@@ -7,7 +7,7 @@
       "AddVertex": "Add New Point",
       "AddVertexHint": "Creates a new point at the current cursor position.",
       "FinishCapture": "End Selection",
-      "FinishCaptureHint": "Create a Tile from the current selected area.",
+      "FinishCaptureHint": "Create a tile from the current selected area.",
       "CancelCapture": "Cancel Selection",
       "CancelCaptureHint": "Cancel the active selection without creating a tile or saving a image.",
       "UndoVertex": "Remove Last Point",
@@ -22,7 +22,7 @@
       },
       "OutputFormat": {
         "Name": "Image format",
-        "Hint": "Choose the file format used for newly created Tiles. Changing this setting won't affect already existing images.",
+        "Hint": "Choose the file format you want to use for newly created tile images. Changing this setting won't affect already existing images.",
         "PNG": "PNG",
         "WebP": "WebP"
       },
@@ -30,9 +30,9 @@
         "Name": "Add New Point",
         "Hint": "Creates a new point at the current cursor position."
       },
-      "MouseButton": {
+      "FinishMouseButton": {
         "Name": "End Selection",
-        "Hint": "Double-click this button to end selection."
+        "Hint": "Double-click this button to create a tile from the current selected area."
       },
       "MouseButton": {
         "Left": "Left",
@@ -54,8 +54,8 @@
     },
     "Errors": {
       "GMOnly": "Only a GM can use this tool.",
-      "NoScene": "No active scene is ready.",
-      "NoBackground": "Could not access the active scene background image.",
+      "NoScene": "No scene is ready.",
+      "NoBackground": "Could not access the scene background image.",
       "UnsupportedTransform": "Rotated or skewed scene backgrounds are not supported yet.",
       "InvalidDimensions": "The background has invalid dimensions.",
       "AlreadyActive": "Selection already active.",
