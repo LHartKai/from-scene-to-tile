@@ -209,12 +209,14 @@ class FromSceneToTile {
     const onPointerDown = (event) => {
       if (destroyed) return;
 
-      // Middle mouse cancels. Right mouse is left untouched so Foundry can
-      // continue using it to pan the canvas.
+      // Middle mouse removes the most recently added vertex.
       if (event.button === 1) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        cancel();
+        if (points.length) {
+          points.pop();
+          redraw();
+        }
         return;
       }
       if (event.button !== 0) return;
@@ -222,15 +224,17 @@ class FromSceneToTile {
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      // A native double-click confirms the polygon without adding another vertex.
+      // Use a timer-based double-click detector: Foundry may suppress or alter
+      // PointerEvent.detail while handling canvas interactions.
+      const screen = { x: event.clientX, y: event.clientY };
+      const scenePoint = toScene(event);
+
       if (event.detail >= 2) {
         if (points.length >= 3) void complete();
         else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
         return;
       }
 
-      const screen = { x: event.clientX, y: event.clientY };
-      const scenePoint = toScene(event);
       points.push({ screen, scene: scenePoint });
       cursor = screen;
       redraw();
@@ -246,8 +250,7 @@ class FromSceneToTile {
       if (destroyed) return;
       if (event.key === "Backspace") {
         event.preventDefault();
-        points.pop();
-        redraw();
+        cancel();
       } else if (event.key === "Enter") {
         event.preventDefault();
         if (points.length >= 3) void complete();
