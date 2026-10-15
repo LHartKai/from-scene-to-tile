@@ -17,7 +17,8 @@
     "Settings": {
       "OutputFolder": {
         "Name": "Pasta de destino",
-        "Hint": "Escolha a pasta de destino usando o seletor de arquivos do Foundry. As imagens geradas serão salvas nessa pasta."
+        "Hint": "Escolha a pasta de destino usando o seletor de arquivos do Foundry. As imagens geradas serão salvas nessa pasta.",
+        "PickerHint": "Abrir o navegador de pastas para escolher o destino."
       },
       "OutputFormat": {
         "Name": "Formato das imagens geradas",
