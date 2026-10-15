@@ -1,0 +1,39 @@
+{
+  "id": "from-scene-to-tile",
+  "title": "From Scene to Tile",
+  "description": "Simple module that let you create Tiles direct from a selected area in your viewed scene.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "maximum": "14"
+  },
+  "authors": [
+    {
+      "name": "LHartKai"
+    }
+  ],
+  "esmodules": [
+    "scripts/from-scene-to-tile.js"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "pt",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    }
+  ],
+  "url": "https://github.com/LHartKai/from-scene-to-tile",
+  "manifest": "https://raw.githubusercontent.com/LHartKai/from-scene-to-tile/main/module.json",
+  "download": "https://github.com/LHartKai/from-scene-to-tile/releases/latest/download/from-scene-to-tile.zip",
+  "license": "LICENSE"
+}

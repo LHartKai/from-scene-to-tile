@@ -1,0 +1,73 @@
+{
+  "FROM_SCENE_TO_TILE": {
+    "Title": "From Scene to Tile",
+    "Controls": {
+      "StartCapture": "Start Selection",
+      "StartCaptureHint": "Starts the area selection.",
+      "AddVertex": "Add New Point",
+      "AddVertexHint": "Creates a new point at the current cursor position.",
+      "FinishCapture": "End Selection",
+      "FinishCaptureHint": "Create a tile from the current selected area.",
+      "CancelCapture": "Cancel Selection",
+      "CancelCaptureHint": "Cancel the active selection without creating a tile or saving a image.",
+      "UndoVertex": "Remove Last Point",
+      "UndoVertexHint": "Undo the last created point.",
+      "Open": "Start capture"
+    },
+    "Settings": {
+      "OutputFolder": {
+        "Name": "Created images directory",
+        "Hint": "Choose the destination folder where all tiles images created with this module will go.",
+        "PickerHint": "Open the folder browser to choose the destination."
+      },
+      "OutputFormat": {
+        "Name": "Image format",
+        "Hint": "Choose the file format you want to use for newly created tile images. Changing this setting won't affect already existing images.",
+        "PNG": "PNG",
+        "WebP": "WebP"
+      },
+      "VertexMouseButton": {
+        "Name": "Add New Point",
+        "Hint": "Creates a new point at the current cursor position."
+      },
+      "FinishMouseButton": {
+        "Name": "End Selection",
+        "Hint": "Double-click this button to create a tile from the current selected area."
+      },
+      "MouseButton": {
+        "Left": "Left",
+        "Middle": "Middle",
+        "Right": "Right"
+      },
+      "UndoMouseButton": {
+        "Name": "Remove Last Point",
+        "Hint": "Undo the last created point."
+      },
+      "MouseControls": {
+        "Name": "Mouse Controls"
+      }
+    },
+    "Messages": {
+      "Instructions": "Selection Active",
+      "Cancelled": "Selection Cancelled.",
+      "Success": "Tile Created."
+    },
+    "Errors": {
+      "GMOnly": "Only a GM can use this tool.",
+      "NoScene": "No scene is ready.",
+      "NoBackground": "Could not access the scene background image.",
+      "UnsupportedTransform": "Rotated or skewed scene backgrounds are not supported yet.",
+      "InvalidDimensions": "The background has invalid dimensions.",
+      "AlreadyActive": "Selection already active.",
+      "NeedThreePoints": "You need atleast three points to create a tile.",
+      "SceneChanged": "The active scene changed during selection.",
+      "BackgroundChanged": "The scene background changed during selection.",
+      "SelectionOutsideBackground": "The selection does not intersect the background image.",
+      "CanvasUnavailable": "Could not create a canvas for the crop.",
+      "ExportFailed": "Could not export the crop. The image may be blocked by browser security restrictions.",
+      "OutputFolderEmpty": "Choose a valid directory folder in module settings.",
+      "UploadFailed": "Upload did not return a usable file path.",
+      "Unexpected": "An unexpected error occurred while creating the Tile."
+    }
+  }
+}

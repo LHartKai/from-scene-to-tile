@@ -1,0 +1,642 @@
+/**
+ * From Scene to Tile
+ * Foundry VTT v13 / v14
+ *
+ * Captures only the scene background image, clips it to a free-form polygon,
+ * uploads a transparent PNG, and creates a Tile aligned to the selection.
+ */
+
+const MODULE_ID = "from-scene-to-tile";
+
+Hooks.once("init", () => {
+  game.settings.register(MODULE_ID, "outputFolder", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    default: `worlds/${game.world.id}/from-scene-to-tile`
+  });
+
+  // Visually group mouse-related settings into one dedicated section.
+  Hooks.on("renderSettingsConfig", (app, html) => {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    if (!root || root.querySelector(".from-scene-to-tile-mouse-controls")) return;
+
+    const keys = ["vertexMouseButton", "undoMouseButton", "finishMouseButton"];
+    const groups = keys.map(key => {
+      const input = root.querySelector(`[name="${MODULE_ID}.${key}"]`);
+      return input?.closest(".form-group");
+    });
+    if (groups.some(group => !group)) return;
+
+    const section = document.createElement("fieldset");
+    section.className = "from-scene-to-tile-mouse-controls";
+    const legend = document.createElement("legend");
+    legend.textContent = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseControls.Name");
+    section.appendChild(legend);
+    Object.assign(section.style, {
+      border: "1px solid var(--color-border-light-2, #555)",
+      borderRadius: "6px",
+      padding: "0.75rem 1rem",
+      margin: "0.75rem 0"
+    });
+
+    const firstGroup = groups[0];
+    firstGroup.parentElement.insertBefore(section, firstGroup);
+    for (const group of groups) {
+      section.appendChild(group);
+    }
+  });
+
+  // A custom folder picker avoids Foundry's file-picker setting field,
+  // which selects files rather than folders in supported V13/V14 builds.
+  Hooks.on("renderSettingsConfig", (app, html) => {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    const setting = root?.querySelector(`[name="${MODULE_ID}.outputFolder"]`);
+    if (!setting || setting.dataset.folderPickerBound) return;
+    setting.dataset.folderPickerBound = "true";
+    setting.readOnly = true;
+    setting.style.cursor = "pointer";
+    setting.title = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.PickerHint");
+
+    const chooseFolder = async () => {
+      const current = String(setting.value || "");
+      const picker = new FilePicker({
+        type: "folder",
+        current,
+        callback: (path) => {
+          setting.value = path;
+          setting.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+      await picker.browse(current || "worlds");
+      picker.render(true);
+    };
+    setting.addEventListener("click", chooseFolder);
+    setting.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        void chooseFolder();
+      }
+    });
+
+    // Keep the folder button beside the path field, not on a separate row.
+    const wrapper = document.createElement("div");
+    wrapper.className = "from-scene-to-tile-folder-picker";
+    Object.assign(wrapper.style, {
+      display: "flex",
+      alignItems: "stretch",
+      gap: "0.35rem",
+      width: "100%"
+    });
+
+    const parent = setting.parentElement;
+    parent.insertBefore(wrapper, setting);
+    wrapper.appendChild(setting);
+    Object.assign(setting.style, {
+      flex: "1 1 auto",
+      minWidth: "0",
+      width: "auto"
+    });
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "file-picker";
+    button.innerHTML = '<i class="fas fa-folder-open"></i>';
+    button.title = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.PickerHint");
+    Object.assign(button.style, {
+      flex: "0 0 2.5rem",
+      width: "2.5rem",
+      minWidth: "2.5rem",
+      margin: "0",
+      padding: "0"
+    });
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      void chooseFolder();
+    });
+    wrapper.appendChild(button);
+  });
+
+  game.settings.register(MODULE_ID, "outputFormat", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      png: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.PNG"),
+      webp: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.WebP")
+    },
+    default: "png"
+  });
+  // Mouse actions are configured here because Foundry's public keybinding
+  // API does not expose mouse-button bindings in Configure Controls.
+  game.settings.register(MODULE_ID, "vertexMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "left"
+  });
+
+  game.settings.register(MODULE_ID, "undoMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "middle"
+  });
+
+  game.settings.register(MODULE_ID, "finishMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "left"
+  });
+
+  // Foundry registers keybindings during init, not ready.
+  game.keybindings.register(MODULE_ID, "startCapture", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCapture"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCaptureHint"),
+    editable: [{ key: "KeyT", modifiers: ["SHIFT", "CONTROL"] }],
+    onDown: () => {
+      if (!game.user.isGM) {
+        ui.notifications.warn(game.i18n.localize("FROM_SCENE_TO_TILE.Errors.GMOnly"));
+        return false;
+      }
+      void FromSceneToTile.start();
+      return true;
+    },
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "addVertex", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.AddVertex"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.AddVertexHint"),
+    editable: [{ key: "KeyV" }],
+    onDown: () => FromSceneToTile.addVertexActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "finishCapture", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.FinishCapture"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.FinishCaptureHint"),
+    editable: [{ key: "Enter" }],
+    onDown: () => FromSceneToTile.finishActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "cancelCapture", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.CancelCapture"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.CancelCaptureHint"),
+    editable: [{ key: "Backspace" }],
+    onDown: () => FromSceneToTile.cancelActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "undoVertex", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.UndoVertex"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.UndoVertexHint"),
+    editable: [{ key: "KeyZ", modifiers: ["CONTROL"] }],
+    onDown: () => FromSceneToTile.undoActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+});
+
+class FromSceneToTile {
+  static active = false;
+  static session = null;
+
+  static addVertexActive() {
+    if (!this.session) return false;
+    this.session.addVertex();
+    return true;
+  }
+
+  static finishActive() {
+    if (!this.session) return false;
+    this.session.finish();
+    return true;
+  }
+
+  static cancelActive() {
+    if (!this.session) return false;
+    this.session.cancel();
+    return true;
+  }
+
+  static undoActive() {
+    if (!this.session) return false;
+    this.session.undo();
+    return true;
+  }
+
+  static localize(key) {
+    return game.i18n.localize(`FROM_SCENE_TO_TILE.${key}`);
+  }
+
+  static notify(key) {
+    ui.notifications.info(this.localize(key));
+  }
+
+  static getBackground() {
+    // The source can be an ImageBitmap in Foundry v14.
+    const sprite = canvas.primary?.background;
+    const source = canvas.primary?.backgroundSource;
+    const imageWidth = source?.width ?? source?.naturalWidth ?? source?.videoWidth;
+    const imageHeight = source?.height ?? source?.naturalHeight ?? source?.videoHeight;
+
+    if (!sprite || !source || !(imageWidth > 0) || !(imageHeight > 0)) {
+      throw new Error(this.localize("Errors.NoBackground"));
+    }
+
+    // This first release deliberately rejects transformed backgrounds until
+    // they have been validated with real v13/v14 scenes.
+    if (sprite.rotation || sprite.skew?.x || sprite.skew?.y) {
+      throw new Error(this.localize("Errors.UnsupportedTransform"));
+    }
+
+    const width = Number(sprite.width);
+    const height = Number(sprite.height);
+    if (!(width > 0) || !(height > 0)) {
+      throw new Error(this.localize("Errors.InvalidDimensions"));
+    }
+
+    const anchorX = sprite.anchor?.x ?? 0.5;
+    const anchorY = sprite.anchor?.y ?? 0.5;
+
+    return {
+      source,
+      imageWidth,
+      imageHeight,
+      x: sprite.x - width * anchorX,
+      y: sprite.y - height * anchorY,
+      width,
+      height,
+      scaleX: imageWidth / width,
+      scaleY: imageHeight / height
+    };
+  }
+
+  static async start() {
+    if (this.active) {
+      ui.notifications.warn(this.localize("Errors.AlreadyActive"));
+      return;
+    }
+    if (!canvas.ready || !canvas.scene) {
+      ui.notifications.warn(this.localize("Errors.NoScene"));
+      return;
+    }
+    if (!game.user.isGM) {
+      ui.notifications.warn(this.localize("Errors.GMOnly"));
+      return;
+    }
+
+    let background;
+    try {
+      background = this.getBackground();
+    } catch (error) {
+      console.error(`[${MODULE_ID}] Background inspection failed`, error);
+      ui.notifications.error(error.message);
+      return;
+    }
+
+    this.active = true;
+    const scene = canvas.scene;
+    const sceneId = scene.id;
+    const view = canvas.app.view;
+    const points = [];
+    let cursor = null;
+    let cursorScene = null;
+    let destroyed = false;
+    let lastLeftClick = null;
+
+    const overlay = document.createElement("div");
+    Object.assign(overlay.style, {
+      position: "fixed",
+      inset: "0",
+      zIndex: "100000",
+      pointerEvents: "none",
+      overflow: "hidden"
+    });
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    Object.assign(svg.style, {
+      position: "absolute",
+      inset: "0",
+      width: "100%",
+      height: "100%",
+      overflow: "visible"
+    });
+
+    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    polygon.setAttribute("fill", "rgba(38,198,218,0.18)");
+    polygon.setAttribute("stroke", "#26c6da");
+    polygon.setAttribute("stroke-width", "2");
+    polygon.setAttribute("stroke-dasharray", "6 3");
+    polygon.setAttribute("stroke-linejoin", "round");
+
+    const preview = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    preview.setAttribute("stroke", "#ffffff");
+    preview.setAttribute("stroke-width", "2");
+    preview.setAttribute("stroke-dasharray", "4 3");
+
+    svg.append(polygon, preview);
+    overlay.appendChild(svg);
+    document.body.appendChild(overlay);
+
+    const cleanup = () => {
+      if (destroyed) return;
+      destroyed = true;
+      view.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("pointermove", onPointerMove, true);
+      window.removeEventListener("contextmenu", onContextMenu, true);
+      window.removeEventListener("wheel", onViewportChange, true);
+      window.removeEventListener("resize", onViewportChange, true);
+      view.style.cursor = "";
+      overlay.remove();
+      this.active = false;
+      this.session = null;
+    };
+
+    const toScene = (event) => canvas.canvasCoordinatesFromClient({
+      x: event.clientX,
+      y: event.clientY
+    });
+
+    // Project stored scene coordinates back into client coordinates every
+    // time the viewport changes, so the polygon stays attached to the scene.
+    const toClient = (point) => {
+      const rect = view.getBoundingClientRect();
+      const rendererPoint = canvas.app.stage.worldTransform.apply(point);
+      const scaleX = rect.width / view.width;
+      const scaleY = rect.height / view.height;
+      return {
+        x: rect.left + rendererPoint.x * scaleX,
+        y: rect.top + rendererPoint.y * scaleY
+      };
+    };
+
+    const redraw = () => {
+      polygon.setAttribute("points", points.map(point => {
+        const screen = toClient(point.scene);
+        return `${screen.x},${screen.y}`;
+      }).join(" "));
+
+      if (points.length && cursor) {
+        const last = toClient(points.at(-1).scene);
+        preview.setAttribute("x1", String(last.x));
+        preview.setAttribute("y1", String(last.y));
+        preview.setAttribute("x2", String(cursor.x));
+        preview.setAttribute("y2", String(cursor.y));
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    };
+
+    const cancel = () => {
+      cleanup();
+      this.notify("Messages.Cancelled");
+    };
+
+    const undo = () => {
+      if (destroyed || !points.length) return;
+      points.pop();
+      redraw();
+    };
+
+    const finish = () => {
+      if (points.length >= 3) void complete();
+      else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
+    };
+
+    const addVertex = () => {
+      if (destroyed || !cursor || !cursorScene) return;
+      points.push({
+        screen: { ...cursor },
+        scene: { ...cursorScene }
+      });
+      redraw();
+    };
+
+    this.session = { finish, cancel, undo, addVertex };
+
+    const mouseButtonCode = (button) => ({ left: 0, middle: 1, right: 2 })[button] ?? 0;
+
+    const onPointerDown = (event) => {
+      if (destroyed) return;
+
+      const vertexButton = mouseButtonCode(game.settings.get(MODULE_ID, "vertexMouseButton"));
+      const finishButton = mouseButtonCode(game.settings.get(MODULE_ID, "finishMouseButton"));
+      const undoButton = mouseButtonCode(game.settings.get(MODULE_ID, "undoMouseButton"));
+      const isVertexButton = event.button === vertexButton;
+      const isFinishButton = event.button === finishButton;
+      const isUndoButton = event.button === undoButton;
+      if (!isVertexButton && !isFinishButton && !isUndoButton) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (isUndoButton) {
+        lastLeftClick = null;
+        undo();
+        return;
+      }
+
+      const now = Date.now();
+      const isDoubleClick = isFinishButton && lastLeftClick
+        && lastLeftClick.button === event.button
+        && now - lastLeftClick.time <= 400
+        && Math.hypot(
+          event.clientX - lastLeftClick.x,
+          event.clientY - lastLeftClick.y
+        ) <= 10;
+
+      if (isDoubleClick) {
+        lastLeftClick = null;
+        finish();
+        return;
+      }
+
+      lastLeftClick = { time: now, x: event.clientX, y: event.clientY, button: event.button };
+      cursor = { x: event.clientX, y: event.clientY };
+      cursorScene = toScene(event);
+      if (isVertexButton) {
+        points.push({ screen: { ...cursor }, scene: { ...cursorScene } });
+        redraw();
+      }
+    };
+
+    const onPointerMove = (event) => {
+      if (destroyed) return;
+      cursor = { x: event.clientX, y: event.clientY };
+      cursorScene = toScene(event);
+      redraw();
+    };
+
+    const onContextMenu = (event) => {
+      // Suppress the browser menu, but never consume the right-button drag:
+      // Foundry still needs its pointer events to pan the canvas.
+      if (destroyed) return;
+      event.preventDefault();
+    };
+
+    const onViewportChange = () => {
+      if (!destroyed) redraw();
+    };
+
+    async function complete() {
+      if (destroyed) return;
+      if (points.length < 3) {
+        ui.notifications.warn(FromSceneToTile.localize("Errors.NeedThreePoints"));
+        return;
+      }
+
+      const selected = points.map(point => ({ ...point.scene }));
+      cleanup();
+
+      try {
+        if (canvas.scene?.id !== sceneId) {
+          throw new Error(FromSceneToTile.localize("Errors.SceneChanged"));
+        }
+        const current = FromSceneToTile.getBackground();
+        if (current.source !== background.source) {
+          throw new Error(FromSceneToTile.localize("Errors.BackgroundChanged"));
+        }
+
+        const imagePoints = selected.map(point => ({
+          x: (point.x - background.x) * background.scaleX,
+          y: (point.y - background.y) * background.scaleY
+        }));
+
+        const minX = Math.max(0, Math.floor(Math.min(...imagePoints.map(p => p.x))));
+        const minY = Math.max(0, Math.floor(Math.min(...imagePoints.map(p => p.y))));
+        const maxX = Math.min(background.imageWidth, Math.ceil(Math.max(...imagePoints.map(p => p.x))));
+        const maxY = Math.min(background.imageHeight, Math.ceil(Math.max(...imagePoints.map(p => p.y))));
+        const width = maxX - minX;
+        const height = maxY - minY;
+
+        if (width < 2 || height < 2) {
+          throw new Error(FromSceneToTile.localize("Errors.SelectionOutsideBackground"));
+        }
+
+        const output = document.createElement("canvas");
+        output.width = width;
+        output.height = height;
+        const context = output.getContext("2d", { alpha: true });
+        if (!context) throw new Error(FromSceneToTile.localize("Errors.CanvasUnavailable"));
+
+        context.beginPath();
+        imagePoints.forEach((point, index) => {
+          const x = point.x - minX;
+          const y = point.y - minY;
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.closePath();
+        context.clip();
+        context.drawImage(background.source, minX, minY, width, height, 0, 0, width, height);
+
+        const requestedFormat = game.settings.get(MODULE_ID, "outputFormat") === "webp"
+          ? "webp"
+          : "png";
+        const requestedMimeType = requestedFormat === "webp" ? "image/webp" : "image/png";
+        const blob = await new Promise((resolve, reject) => {
+          output.toBlob(result => {
+            if (result) resolve(result);
+            else reject(new Error(FromSceneToTile.localize("Errors.ExportFailed")));
+          }, requestedMimeType);
+        });
+
+        // Some browsers may fall back to PNG when WebP encoding is unavailable.
+        // Use the actual MIME type returned by the browser for the filename.
+        const actualFormat = blob.type === "image/webp" ? "webp" : "png";
+        if (requestedFormat === "webp" && actualFormat !== "webp") {
+          console.warn(`[${MODULE_ID}] WebP encoding unavailable; the browser exported PNG instead.`);
+        }
+
+        const folder = String(game.settings.get(MODULE_ID, "outputFolder") || "")
+          .trim().replace(/^\/+|\/+$/g, "");
+        if (!folder) throw new Error(FromSceneToTile.localize("Errors.OutputFolderEmpty"));
+
+        // The target directory must exist on the data source before upload.
+        // An error here can also mean that the directory already exists.
+        try {
+          await FilePicker.createDirectory("data", folder);
+        } catch (error) {
+          console.debug(`[${MODULE_ID}] Directory creation skipped/failed`, error);
+        }
+
+        const file = new File([blob], `polygon-${Date.now()}.${actualFormat}`, { type: blob.type || "image/png" });
+        let uploaded;
+        try {
+          uploaded = await FilePicker.upload("data", folder, file, {}, {});
+        } catch (firstError) {
+          console.error(`[${MODULE_ID}] Upload to data source failed`, firstError);
+          throw new Error(FromSceneToTile.localize("Errors.UploadFailed"));
+        }
+
+        if (!uploaded?.path) throw new Error(FromSceneToTile.localize("Errors.UploadFailed"));
+
+        const tileX = background.x + minX / background.scaleX;
+        const tileY = background.y + minY / background.scaleY;
+        const tileWidth = width / background.scaleX;
+        const tileHeight = height / background.scaleY;
+
+        await scene.createEmbeddedDocuments("Tile", [{
+          x: tileX,
+          y: tileY,
+          width: tileWidth,
+          height: tileHeight,
+          texture: { src: uploaded.path },
+          overhead: false,
+          hidden: false,
+          locked: false,
+          alpha: 1
+        }]);
+
+        ui.notifications.info(FromSceneToTile.localize("Messages.Success"));
+      } catch (error) {
+        console.error(`[${MODULE_ID}] Polygon capture failed`, error);
+        ui.notifications.error(error?.message || FromSceneToTile.localize("Errors.Unexpected"));
+      }
+    }
+
+    view.style.cursor = "crosshair";
+    view.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("pointermove", onPointerMove, true);
+    window.addEventListener("contextmenu", onContextMenu, true);
+    window.addEventListener("wheel", onViewportChange, true);
+    window.addEventListener("resize", onViewportChange, true);
+    this.notify("Messages.Instructions");
+  }
+}
+
+globalThis.FromSceneToTile = FromSceneToTile;

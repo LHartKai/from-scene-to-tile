@@ -1,0 +1,73 @@
+{
+  "FROM_SCENE_TO_TILE": {
+    "Title": "From Scene to Tile",
+    "Controls": {
+      "StartCapture": "Iniciar Seleção",
+      "StartCaptureHint": "Inicia a seleção de área",
+      "AddVertex": "Adicionar Novo Ponto",
+      "AddVertexHint": "Cria um novo ponto na posição atual do cursor do mouse.",
+      "FinishCapture": "Concluir Seleção",
+      "FinishCaptureHint": "Cria um novo tile a partir da área selecionada.",
+      "CancelCapture": "Cancelar Seleção",
+      "CancelCaptureHint": "Cancela a seleção sem criar um tile ou salvar uma imagem.",
+      "UndoVertex": "Remover Último Ponto",
+      "UndoVertexHint": "Remove o último ponto criado.",
+      "Open": "Iniciar recorte"
+    },
+    "Settings": {
+      "OutputFolder": {
+        "Name": "Diretório de imagens",
+        "Hint": "Escolha uma pasta para o modulo salvar as imagens criadas por ele.",
+        "PickerHint": "Abrir o navegador de pastas para escolher o destino."
+      },
+      "OutputFormat": {
+        "Name": "Formato das imagens",
+        "Hint": "Escolha em que formato as imagens criadas para os tiles criadas vão ser salvas. Mudar essa configuração não afeta imagens já existentes.",
+        "PNG": "PNG",
+        "WebP": "WebP"
+      },
+      "VertexMouseButton": {
+        "Name": "Adicionar Novo Ponto",
+        "Hint": "Cria um novo ponto na posição atual do cursor do mouse.."
+      },
+      "FinishMouseButton": {
+        "Name": "Concluir Seleção",
+        "Hint": "Dê dois cliques com este botão para criar um novo tile a partir da área selecionada."
+      },
+      "MouseButton": {
+        "Left": "Esquerdo",
+        "Middle": "Meio",
+        "Right": "Direito"
+      },
+      "UndoMouseButton": {
+        "Name": "Remover Último Ponto",
+        "Hint": "Remove o último ponto criado."
+      },
+      "MouseControls": {
+        "Name": "Controles do Mouse"
+      }
+    },
+    "Messages": {
+      "Instructions": "Seleção Ativa",
+      "Cancelled": "Seleção Cancelada.",
+      "Success": "Tile criado."
+    },
+    "Errors": {
+      "GMOnly": "Somente o Gamemaster pode usar esta ferramenta.",
+      "NoScene": "Nenhuma cena está pronta.",
+      "NoBackground": "Não foi possível acessar a imagem de fundo desta cena.",
+      "UnsupportedTransform": "Fundos rotacionados ou inclinados ainda não são suportados.",
+      "InvalidDimensions": "O fundo possui dimensões inválidas.",
+      "AlreadyActive": "Seleção já está ativa,",
+      "NeedThreePoints": "Adicione pelo menos três pontos para criar um tile.",
+      "SceneChanged": "A cena ativa mudou durante a seleção.",
+      "BackgroundChanged": "O fundo da cena mudou durante a seleção.",
+      "SelectionOutsideBackground": "A seleção não consegue inteseptar a imagem de fundo.",
+      "CanvasUnavailable": "Não foi possível criar o canvas do recorte.",
+      "ExportFailed": "Não foi possível exportar o recorte. O navegador pode estar bloqueando o acesso à imagem.",
+      "OutputFolderEmpty": "Configure um diretório válido nas configurações do módulo.",
+      "UploadFailed": "O upload não retornou um caminho de arquivo utilizável.",
+      "Unexpected": "Ocorreu um erro inesperado ao criar o Tile."
+    }
+  }
+}
