@@ -17,7 +17,7 @@
     "Settings": {
       "OutputFolder": {
         "Name": "Output folder",
-        "Hint": "Data-source-relative folder where generated images will be uploaded."
+        "Hint": "Choose the destination folder using Foundry's file picker. Generated images will be saved there."
       },
       "OutputFormat": {
         "Name": "Output image format",
