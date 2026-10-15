@@ -1,7 +1,7 @@
 {
   "id": "from-scene-to-tile",
   "title": "From Scene to Tile",
-  "description": "Select a free-form polygon from a scene background and create a transparent Tile from the selected region.",
+  "description": "Simple module that let you create Tiles direct from a selected area in your viewed scene.",
   "version": "0.1.0",
   "compatibility": {
     "minimum": "13",
