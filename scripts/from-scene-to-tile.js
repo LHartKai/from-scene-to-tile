@@ -316,14 +316,20 @@ class FromSceneToTile {
           .trim().replace(/^\/+|\/+$/g, "");
         if (!folder) throw new Error(FromSceneToTile.localize("Errors.OutputFolderEmpty"));
 
-        // FilePicker.upload expects a source such as "data" or "public",
-        // not the core uploadDirectory setting's path value.
+        // The target directory must exist on the data source before upload.
+        // An error here can also mean that the directory already exists.
+        try {
+          await FilePicker.createDirectory("data", folder);
+        } catch (error) {
+          console.debug(`[${MODULE_ID}] Directory creation skipped/failed`, error);
+        }
+
         const file = new File([blob], `polygon-${Date.now()}.png`, { type: "image/png" });
         let uploaded;
         try {
           uploaded = await FilePicker.upload("data", folder, file, {}, {});
         } catch (firstError) {
-          console.warn(`[${MODULE_ID}] Upload to data source failed`, firstError);
+          console.error(`[${MODULE_ID}] Upload to data source failed`, firstError);
           throw new Error(FromSceneToTile.localize("Errors.UploadFailed"));
         }
 
