@@ -6,7 +6,7 @@
       "StartCaptureHint": "Starts the area selection.",
       "AddVertex": "Add New Point",
       "AddVertexHint": "Creates a new point at the current cursor position.",
-      "FinishCapture": "Finish Selection",
+      "FinishCapture": "End Selection",
       "FinishCaptureHint": "Create a Tile from the current selected area.",
       "CancelCapture": "Cancel Selection",
       "CancelCaptureHint": "Cancel the active selection without creating a tile or saving a image.",
@@ -30,9 +30,9 @@
         "Name": "Add New Point",
         "Hint": "Creates a new point at the current cursor position."
       },
-      "FinishMouseButton": {
-        "Name": "Finish Selection",
-        "Hint": "Double-click this button to finish the selection."
+      "MouseButton": {
+        "Name": "End Selection",
+        "Hint": "Double-click this button to end selection."
       },
       "MouseButton": {
         "Left": "Left",
