@@ -15,8 +15,51 @@ Hooks.once("init", () => {
     scope: "world",
     config: true,
     type: String,
-    filePicker: true,
     default: `worlds/${game.world.id}/from-scene-to-tile`
+  });
+
+  // A custom folder picker avoids Foundry's file-picker setting field,
+  // which selects files rather than folders in supported V13/V14 builds.
+  Hooks.on("renderSettingsConfig", (app, html) => {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    const setting = root?.querySelector(`[name="${MODULE_ID}.outputFolder"]`);
+    if (!setting || setting.dataset.folderPickerBound) return;
+    setting.dataset.folderPickerBound = "true";
+    setting.readOnly = true;
+    setting.style.cursor = "pointer";
+    setting.title = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.PickerHint");
+
+    const chooseFolder = async () => {
+      const current = String(setting.value || "");
+      const picker = new FilePicker({
+        type: "folder",
+        current,
+        callback: (path) => {
+          setting.value = path;
+          setting.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+      await picker.browse(current || "worlds");
+      picker.render(true);
+    };
+    setting.addEventListener("click", chooseFolder);
+    setting.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        void chooseFolder();
+      }
+    });
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "file-picker";
+    button.innerHTML = '<i class="fas fa-folder-open"></i>';
+    button.title = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.PickerHint");
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      void chooseFolder();
+    });
+    setting.insertAdjacentElement("afterend", button);
   });
 
   game.settings.register(MODULE_ID, "outputFormat", {
