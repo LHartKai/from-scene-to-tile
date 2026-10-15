@@ -1,10 +1,8 @@
-# ⚠️ AI WAS USED FOR CODING ⚠️
----
-
 # From Scene to Tile
 
 Simple module that let you create Tiles direct from a selected area in your viewed scene. For now, it only captures things present on the background image; tokens, walls, lights, weather, and other rendered layers are excluded.
 
+# ⚠️ AI WAS USED FOR CODING ⚠️
 ---
 
 ## How to Use
