@@ -38,6 +38,10 @@
         "Left": "Left",
         "Middle": "Middle",
         "Right": "Right"
+      },
+      "UndoMouseButton": {
+        "Name": "Mouse button to undo vertex",
+        "Hint": "Click to remove the most recently added vertex during capture."
       }
     },
     "Messages": {
