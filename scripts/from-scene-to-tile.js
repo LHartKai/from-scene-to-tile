@@ -15,7 +15,7 @@ Hooks.once("init", () => {
     scope: "world",
     config: true,
     type: String,
-    filePicker: "folder",
+    filePicker: true,
     default: `worlds/${game.world.id}/from-scene-to-tile`
   });
 
