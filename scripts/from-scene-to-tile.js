@@ -116,6 +116,7 @@ class FromSceneToTile {
     const points = [];
     let cursor = null;
     let destroyed = false;
+    let lastLeftClick = null;
 
     const overlay = document.createElement("div");
     Object.assign(overlay.style, {
@@ -224,17 +225,32 @@ class FromSceneToTile {
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      // Use a timer-based double-click detector: Foundry may suppress or alter
-      // PointerEvent.detail while handling canvas interactions.
-      const screen = { x: event.clientX, y: event.clientY };
-      const scenePoint = toScene(event);
+      // Detect the second left click ourselves instead of relying on
+      // PointerEvent.detail, which may be altered by Foundry's canvas handlers.
+      // The two clicks must be close in both time and screen position.
+      const now = Date.now();
+      const isDoubleClick = lastLeftClick
+        && now - lastLeftClick.time <= 400
+        && Math.hypot(
+          event.clientX - lastLeftClick.x,
+          event.clientY - lastLeftClick.y
+        ) <= 10;
 
-      if (event.detail >= 2) {
+      if (isDoubleClick) {
+        lastLeftClick = null;
         if (points.length >= 3) void complete();
         else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
         return;
       }
 
+      lastLeftClick = {
+        time: now,
+        x: event.clientX,
+        y: event.clientY
+      };
+
+      const screen = { x: event.clientX, y: event.clientY };
+      const scenePoint = toScene(event);
       points.push({ screen, scene: scenePoint });
       cursor = screen;
       redraw();
