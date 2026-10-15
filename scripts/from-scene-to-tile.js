@@ -18,6 +18,37 @@ Hooks.once("init", () => {
     default: `worlds/${game.world.id}/from-scene-to-tile`
   });
 
+  // Visually group mouse-related settings into one dedicated section.
+  Hooks.on("renderSettingsConfig", (app, html) => {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    if (!root || root.querySelector(".from-scene-to-tile-mouse-controls")) return;
+
+    const keys = ["vertexMouseButton", "undoMouseButton", "finishMouseButton"];
+    const groups = keys.map(key => {
+      const input = root.querySelector(`[name="${MODULE_ID}.${key}"]`);
+      return input?.closest(".form-group");
+    });
+    if (groups.some(group => !group)) return;
+
+    const section = document.createElement("fieldset");
+    section.className = "from-scene-to-tile-mouse-controls";
+    const legend = document.createElement("legend");
+    legend.textContent = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseControls.Name");
+    section.appendChild(legend);
+    Object.assign(section.style, {
+      border: "1px solid var(--color-border-light-2, #555)",
+      borderRadius: "6px",
+      padding: "0.75rem 1rem",
+      margin: "0.75rem 0"
+    });
+
+    const firstGroup = groups[0];
+    firstGroup.parentElement.insertBefore(section, firstGroup);
+    for (const group of groups) {
+      section.appendChild(group);
+    }
+  });
+
   // A custom folder picker avoids Foundry's file-picker setting field,
   // which selects files rather than folders in supported V13/V14 builds.
   Hooks.on("renderSettingsConfig", (app, html) => {
