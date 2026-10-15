@@ -18,8 +18,8 @@ Simple module that let you create Tiles direct from a selected area in your view
 
 First of all, go to the scene you want to crop a piece of, then follow the control chart as you need.
 
-| Action | Default Keybord Input | Default Mouse Imput | Dev Note |
-| ;---; | ;---; | ;---; | ;---; |
+| Action | Default Keyboard Input | Default Mouse Input | Dev Note |
+| --- | --- | --- | --- |
 | Start Selection | `Ctrl + Shift + T` | - | You still can move your camera around the scene with Right Click during this |
 | Add New Point | `V` | `Left Click` | Works the same as when you are building a wall and wants |
 | Remove Last Point | `Ctrl + Z` | `Midle Click` | Removing all points dosn't ends your selection |
