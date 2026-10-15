@@ -4,22 +4,42 @@
     "Controls": {
       "StartCapture": "Capture Background Polygon as Tile",
       "StartCaptureHint": "Draw a free-form polygon over the scene background, then create a transparent Tile.",
+      "FinishCapture": "Finish polygon capture",
+      "FinishCaptureHint": "Create a Tile from the current polygon selection.",
+      "CancelCapture": "Cancel polygon capture",
+      "CancelCaptureHint": "Cancel the active polygon selection.",
+      "UndoVertex": "Remove last polygon vertex",
+      "UndoVertexHint": "Remove the most recently added polygon vertex.",
       "Open": "Start capture"
     },
     "Settings": {
       "OutputFolder": {
         "Name": "Output folder",
-        "Hint": "Data-source-relative folder where generated PNG files will be uploaded."
+        "Hint": "Data-source-relative folder where generated images will be uploaded."
       },
       "OutputFormat": {
         "Name": "Output image format",
         "Hint": "Choose the file format used for newly created Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
+      },
+      "VertexButton": {
+        "Name": "Mouse button to add vertices",
+        "Hint": "Choose which mouse button adds polygon vertices. Double-click that button to finish."
+      },
+      "UndoButton": {
+        "Name": "Mouse button to remove the last vertex",
+        "Hint": "Choose a different button from the vertex button, or disable mouse undo."
+      },
+      "MouseButtons": {
+        "Left": "Left mouse button",
+        "Middle": "Middle mouse button",
+        "Right": "Right mouse button",
+        "Disabled": "Disabled"
       }
     },
     "Messages": {
-      "Instructions": "Click to add polygon vertices. Click the first point, press Enter, or right-click to finish. Backspace removes a point; Esc cancels.",
+      "Instructions": "Use your configured mouse button to add vertices; double-click it to finish. Keyboard shortcuts can be changed in Configure Controls. The right mouse button pans the canvas by default.",
       "Cancelled": "Polygon capture cancelled.",
       "Success": "Transparent image uploaded and Tile created."
     },
