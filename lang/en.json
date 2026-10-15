@@ -1,0 +1,38 @@
+{
+  "FROM_SCENE_TO_TILE": {
+    "Title": "From Scene to Tile",
+    "Controls": {
+      "StartCapture": "Capture Background Polygon as Tile",
+      "StartCaptureHint": "Draw a free-form polygon over the scene background, then create a transparent Tile.",
+      "Open": "Start capture"
+    },
+    "Settings": {
+      "OutputFolder": {
+        "Name": "Output folder",
+        "Hint": "Data-source-relative folder where generated PNG files will be uploaded."
+      }
+    },
+    "Messages": {
+      "Instructions": "Click to add polygon vertices. Click the first point, press Enter, or right-click to finish. Backspace removes a point; Esc cancels.",
+      "Cancelled": "Polygon capture cancelled.",
+      "Success": "Transparent PNG uploaded and Tile created."
+    },
+    "Errors": {
+      "GMOnly": "Only a GM can use this tool.",
+      "NoScene": "No active scene is ready.",
+      "NoBackground": "Could not access the active scene background image.",
+      "UnsupportedTransform": "Rotated or skewed scene backgrounds are not supported yet.",
+      "InvalidDimensions": "The background has invalid dimensions.",
+      "AlreadyActive": "A polygon capture is already active.",
+      "NeedThreePoints": "Add at least three points to create a polygon.",
+      "SceneChanged": "The active scene changed during selection.",
+      "BackgroundChanged": "The scene background changed during selection.",
+      "SelectionOutsideBackground": "The polygon does not intersect the background image.",
+      "CanvasUnavailable": "Could not create a canvas for the crop.",
+      "ExportFailed": "Could not export the crop as PNG. The image may be blocked by browser security restrictions.",
+      "OutputFolderEmpty": "Choose a valid output folder in module settings.",
+      "UploadFailed": "The upload did not return a usable file path.",
+      "Unexpected": "An unexpected error occurred while creating the Tile."
+    }
+  }
+}
