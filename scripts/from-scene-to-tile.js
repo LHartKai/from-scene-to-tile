@@ -88,6 +88,20 @@ Hooks.once("init", () => {
     default: "left"
   });
 
+  game.settings.register(MODULE_ID, "undoMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "middle"
+  });
+
   game.settings.register(MODULE_ID, "finishMouseButton", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Name"),
     hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Hint"),
@@ -382,12 +396,20 @@ class FromSceneToTile {
 
       const vertexButton = mouseButtonCode(game.settings.get(MODULE_ID, "vertexMouseButton"));
       const finishButton = mouseButtonCode(game.settings.get(MODULE_ID, "finishMouseButton"));
+      const undoButton = mouseButtonCode(game.settings.get(MODULE_ID, "undoMouseButton"));
       const isVertexButton = event.button === vertexButton;
       const isFinishButton = event.button === finishButton;
-      if (!isVertexButton && !isFinishButton) return;
+      const isUndoButton = event.button === undoButton;
+      if (!isVertexButton && !isFinishButton && !isUndoButton) return;
 
       event.preventDefault();
       event.stopImmediatePropagation();
+
+      if (isUndoButton) {
+        lastLeftClick = null;
+        undo();
+        return;
+      }
 
       const now = Date.now();
       const isDoubleClick = isFinishButton && lastLeftClick
