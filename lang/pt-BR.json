@@ -24,10 +24,23 @@
         "Hint": "Escolha o formato dos arquivos usados nos novos Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
+      },
+      "VertexMouseButton": {
+        "Name": "Botão do mouse para adicionar vértices",
+        "Hint": "Escolha qual botão do mouse adiciona vértices durante o recorte."
+      },
+      "FinishMouseButton": {
+        "Name": "Botão do mouse para concluir",
+        "Hint": "Dê dois cliques com este botão para concluir o polígono."
+      },
+      "MouseButton": {
+        "Left": "Esquerdo",
+        "Middle": "Central",
+        "Right": "Direito"
       }
     },
     "Messages": {
-      "Instructions": "Clique com o botão esquerdo para adicionar vértices e dê dois cliques para concluir. Os atalhos podem ser alterados em Configurar controles; o botão direito movimenta o canvas.",
+      "Instructions": "Use o botão configurado para adicionar vértices e dê dois cliques com o botão configurado para concluir. Os atalhos de teclado podem ser alterados em Configurar controles.",
       "Cancelled": "Recorte poligonal cancelado.",
       "Success": "Imagem transparente enviada e Tile criado."
     },
