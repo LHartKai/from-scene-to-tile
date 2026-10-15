@@ -10,12 +10,18 @@
       "OutputFolder": {
         "Name": "Pasta de destino",
         "Hint": "Pasta relativa à origem de arquivos onde os PNGs gerados serão enviados."
+      },
+      "OutputFormat": {
+        "Name": "Formato das imagens geradas",
+        "Hint": "Escolha o formato dos arquivos usados nos novos Tiles.",
+        "PNG": "PNG",
+        "WebP": "WebP"
       }
     },
     "Messages": {
       "Instructions": "Clique para adicionar vértices. Clique no primeiro ponto, pressione Enter ou clique com o botão direito para concluir. Backspace remove um ponto; Esc cancela.",
       "Cancelled": "Recorte poligonal cancelado.",
-      "Success": "PNG transparente enviado e Tile criado."
+      "Success": "Imagem transparente enviada e Tile criado."
     },
     "Errors": {
       "GMOnly": "Somente um Mestre pode usar esta ferramenta.",
