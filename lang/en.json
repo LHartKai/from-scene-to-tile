@@ -24,7 +24,7 @@
         "Hint": "Choose the file format used for newly created Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
-      },
+      }
     },
     "Messages": {
       "Instructions": "Left-click to add vertices and double-click to finish. Keyboard shortcuts can be changed in Configure Controls; right-click pans the canvas.",
