@@ -4,22 +4,42 @@
     "Controls": {
       "StartCapture": "Recortar polígono do fundo como Tile",
       "StartCaptureHint": "Desenhe um polígono livre sobre o fundo da cena para criar um Tile transparente.",
+      "FinishCapture": "Concluir recorte poligonal",
+      "FinishCaptureHint": "Criar um Tile a partir do polígono selecionado.",
+      "CancelCapture": "Cancelar recorte poligonal",
+      "CancelCaptureHint": "Cancelar a seleção poligonal em andamento.",
+      "UndoVertex": "Remover último vértice",
+      "UndoVertexHint": "Remover o vértice adicionado mais recentemente.",
       "Open": "Iniciar recorte"
     },
     "Settings": {
       "OutputFolder": {
         "Name": "Pasta de destino",
-        "Hint": "Pasta relativa à origem de arquivos onde os PNGs gerados serão enviados."
+        "Hint": "Pasta relativa à origem de arquivos onde as imagens geradas serão enviadas."
       },
       "OutputFormat": {
         "Name": "Formato das imagens geradas",
         "Hint": "Escolha o formato dos arquivos usados nos novos Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
+      },
+      "VertexButton": {
+        "Name": "Botão do mouse para adicionar vértices",
+        "Hint": "Escolha qual botão adiciona vértices. Um duplo clique nesse botão conclui o polígono."
+      },
+      "UndoButton": {
+        "Name": "Botão do mouse para remover o último vértice",
+        "Hint": "Escolha um botão diferente do usado para adicionar vértices ou desative essa ação pelo mouse."
+      },
+      "MouseButtons": {
+        "Left": "Botão esquerdo",
+        "Middle": "Botão do meio",
+        "Right": "Botão direito",
+        "Disabled": "Desativado"
       }
     },
     "Messages": {
-      "Instructions": "Clique para adicionar vértices. Clique no primeiro ponto, pressione Enter ou clique com o botão direito para concluir. Backspace remove um ponto; Esc cancela.",
+      "Instructions": "Use o botão do mouse configurado para adicionar vértices; dê dois cliques nele para concluir. Os atalhos de teclado podem ser alterados em Configurar controles. Por padrão, o botão direito movimenta o canvas.",
       "Cancelled": "Recorte poligonal cancelado.",
       "Success": "Imagem transparente enviada e Tile criado."
     },
