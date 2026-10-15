@@ -158,6 +158,8 @@ class FromSceneToTile {
       window.removeEventListener("pointermove", onPointerMove, true);
       window.removeEventListener("keydown", onKeyDown, true);
       window.removeEventListener("contextmenu", onContextMenu, true);
+      window.removeEventListener("wheel", onViewportChange, true);
+      window.removeEventListener("resize", onViewportChange, true);
       view.style.cursor = "";
       overlay.remove();
       this.active = false;
@@ -168,13 +170,27 @@ class FromSceneToTile {
       y: event.clientY
     });
 
+    // Project stored scene coordinates back into client coordinates every
+    // time the viewport changes, so the polygon stays attached to the scene.
+    const toClient = (point) => {
+      const rect = view.getBoundingClientRect();
+      const rendererPoint = canvas.app.stage.worldTransform.apply(point);
+      const scaleX = rect.width / view.width;
+      const scaleY = rect.height / view.height;
+      return {
+        x: rect.left + rendererPoint.x * scaleX,
+        y: rect.top + rendererPoint.y * scaleY
+      };
+    };
+
     const redraw = () => {
-      polygon.setAttribute("points", points.map(point =>
-        `${point.screen.x},${point.screen.y}`
-      ).join(" "));
+      polygon.setAttribute("points", points.map(point => {
+        const screen = toClient(point.scene);
+        return `${screen.x},${screen.y}`;
+      }).join(" "));
 
       if (points.length && cursor) {
-        const last = points.at(-1).screen;
+        const last = toClient(points.at(-1).scene);
         preview.setAttribute("x1", String(last.x));
         preview.setAttribute("y1", String(last.y));
         preview.setAttribute("x2", String(cursor.x));
@@ -193,11 +209,12 @@ class FromSceneToTile {
     const onPointerDown = (event) => {
       if (destroyed) return;
 
-      if (event.button === 2) {
+      // Middle mouse cancels. Right mouse is left untouched so Foundry can
+      // continue using it to pan the canvas.
+      if (event.button === 1) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (points.length >= 3) void complete();
-        else cancel();
+        cancel();
         return;
       }
       if (event.button !== 0) return;
@@ -205,18 +222,15 @@ class FromSceneToTile {
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      const screen = { x: event.clientX, y: event.clientY };
-      const scenePoint = toScene(event);
-
-      // Clicking near the first vertex closes the polygon.
-      if (points.length >= 3) {
-        const first = points[0].screen;
-        if (Math.hypot(screen.x - first.x, screen.y - first.y) <= 12) {
-          void complete();
-          return;
-        }
+      // A native double-click confirms the polygon without adding another vertex.
+      if (event.detail >= 2) {
+        if (points.length >= 3) void complete();
+        else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
+        return;
       }
 
+      const screen = { x: event.clientX, y: event.clientY };
+      const scenePoint = toScene(event);
       points.push({ screen, scene: scenePoint });
       cursor = screen;
       redraw();
@@ -230,10 +244,7 @@ class FromSceneToTile {
 
     const onKeyDown = (event) => {
       if (destroyed) return;
-      if (event.key === "Escape") {
-        event.preventDefault();
-        cancel();
-      } else if (event.key === "Backspace") {
+      if (event.key === "Backspace") {
         event.preventDefault();
         points.pop();
         redraw();
@@ -245,11 +256,14 @@ class FromSceneToTile {
     };
 
     const onContextMenu = (event) => {
+      // Suppress the browser menu, but never consume the right-button drag:
+      // Foundry still needs its pointer events to pan the canvas.
       if (destroyed) return;
       event.preventDefault();
-      event.stopImmediatePropagation();
-      if (points.length >= 3) void complete();
-      else cancel();
+    };
+
+    const onViewportChange = () => {
+      if (!destroyed) redraw();
     };
 
     async function complete() {
@@ -363,6 +377,8 @@ class FromSceneToTile {
     window.addEventListener("pointermove", onPointerMove, true);
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("contextmenu", onContextMenu, true);
+    window.addEventListener("wheel", onViewportChange, true);
+    window.addEventListener("resize", onViewportChange, true);
     this.notify("Messages.Instructions");
   }
 }
