@@ -4,68 +4,68 @@
     "Controls": {
       "StartCapture": "Iniciar Seleção",
       "StartCaptureHint": "Inicia a seleção de área",
-      "AddVertex": "Adicionar vértice na posição do cursor",
-      "AddVertexHint": "Adicionar um vértice na posição atual do cursor durante o recorte.",
-      "FinishCapture": "Concluir recorte poligonal",
-      "FinishCaptureHint": "Criar um Tile a partir do polígono selecionado.",
-      "CancelCapture": "Cancelar recorte poligonal",
-      "CancelCaptureHint": "Cancelar a seleção poligonal em andamento.",
-      "UndoVertex": "Remover último vértice",
-      "UndoVertexHint": "Remover o vértice adicionado mais recentemente.",
+      "AddVertex": "Adicionar Novo Ponto",
+      "AddVertexHint": "Cria um novo ponto na posição atual do cursor do mouse.",
+      "FinishCapture": "Concluir Seleção",
+      "FinishCaptureHint": "Cria um novo tile a partir da área selecionada.",
+      "CancelCapture": "Cancelar Seleção",
+      "CancelCaptureHint": "Cancela a seleção sem criar um tile ou salvar uma imagem.",
+      "UndoVertex": "Remover Último Ponto",
+      "UndoVertexHint": "Remove o último ponto criado.",
       "Open": "Iniciar recorte"
     },
     "Settings": {
       "OutputFolder": {
-        "Name": "Pasta de destino",
-        "Hint": "Escolha a pasta de destino usando o seletor de arquivos do Foundry. As imagens geradas serão salvas nessa pasta.",
+        "Name": "Diretório de imagens",
+        "Hint": "Escolha uma pasta para o modulo salvar as imagens criadas por ele.",
         "PickerHint": "Abrir o navegador de pastas para escolher o destino."
       },
       "OutputFormat": {
-        "Name": "Formato das imagens geradas",
-        "Hint": "Escolha o formato dos arquivos usados nos novos Tiles.",
+        "Name": "Formato das imagens",
+        "Hint": "Escolha em que formato as imagens criadas para os tiles criadas vão ser salvas. Mudar essa configuração não afeta imagens já existentes.",
         "PNG": "PNG",
         "WebP": "WebP"
       },
       "VertexMouseButton": {
-        "Name": "Controles do mouse — adicionar vértices",
-        "Hint": "Escolha qual botão do mouse adiciona vértices durante o recorte."
+        "Name": "Adicionar Novo Ponto",
+        "Hint": "Cria um novo ponto na posição atual do cursor do mouse.."
       },
       "FinishMouseButton": {
-        "Name": "Controles do mouse — concluir seleção",
-        "Hint": "Dê dois cliques com este botão para concluir o polígono."
+        "Name": "Concluir Seleção",
+        "Hint": "Dê dois cliques com este botão para criar um novo tile a partir da área selecionada."
       },
       "MouseButton": {
         "Left": "Esquerdo",
-        "Middle": "Central",
+        "Middle": "Meio",
         "Right": "Direito"
       },
       "UndoMouseButton": {
-        "Name": "Controles do mouse — remover vértice",
-        "Hint": "Clique para remover o último vértice adicionado durante o recorte."
+        "Name": "Remover Último Ponto",
+        "Hint": "Remove o último ponto criado."
       },
       "MouseControls": {
-        "Name": "Controles do mouse"
+        "Name": "Controles do Mouse"
       }
     },
     "Messages": {
-      "Instructions": "Use o botão configurado para adicionar vértices e dê dois cliques com o botão configurado para concluir. Os atalhos de teclado podem ser alterados em Configurar controles.",
-      "Cancelled": "Recorte poligonal cancelado.",
-      "Success": "Imagem transparente enviada e Tile criado."
+      "Instructions": "Seleção Ativa",
+      "Cancelled": "Seleção Cancelada.",
+      "Success": "Tile criado."
     },
     "Errors": {
-      "GMOnly": "Somente um Mestre pode usar esta ferramenta.",
-      "NoScene": "Nenhuma cena ativa está pronta.",
-      "NoBackground": "Não foi possível acessar a imagem de fundo da cena ativa.",
+      "GMOnly": "Somente o Gamemaster pode usar esta ferramenta.",
+      "NoScene": "Nenhuma cena está pronta.",
+      "NoBackground": "Não foi possível acessar a imagem de fundo desta cena.",
       "UnsupportedTransform": "Fundos rotacionados ou inclinados ainda não são suportados.",
       "InvalidDimensions": "O fundo possui dimensões inválidas.",
-      "AlreadyActive": "Já existe um recorte poligonal em andamento.",
-      "NeedThreePoints": "Adicione pelo menos três pontos para criar um polígono.",
+      "AlreadyActive": "Seleção já está ativa,",
+      "NeedThreePoints": "Adicione pelo menos três pontos para criar um tile.",
       "SceneChanged": "A cena ativa mudou durante a seleção.",
       "BackgroundChanged": "O fundo da cena mudou durante a seleção.",
-      "SelectionOutsideBackground": "O polígono não intersecta a imagem de fundo.",
+      "SelectionOutsideBackground": "A seleção não consegue inteseptar a imagem de fundo.",
       "CanvasUnavailable": "Não foi possível criar o canvas do recorte.",
-      "ExportFailed": "Não foi possível exportar o recorte em PNG. O navegador pode estar bloqueando o acesso à imagem.",
-      "OutputFolderEmpty": "Configure uma pasta de destino válida nas configurações do módulo.",
+      "ExportFailed": "Não foi possível exportar o recorte. O navegador pode estar bloqueando o acesso à imagem.",
+      "OutputFolderEmpty": "Configure um diretório válido nas configurações do módulo.",
       "UploadFailed": "O upload não retornou um caminho de arquivo utilizável.",
       "Unexpected": "Ocorreu um erro inesperado ao criar o Tile."
     }
