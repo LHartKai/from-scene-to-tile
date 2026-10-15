@@ -30,35 +30,6 @@ Hooks.once("init", () => {
     },
     default: "png"
   });
-  game.settings.register(MODULE_ID, "vertexButton", {
-    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexButton.Name"),
-    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexButton.Hint"),
-    scope: "world",
-    config: true,
-    type: String,
-    choices: {
-      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Left"),
-      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Middle"),
-      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Right")
-    },
-    default: "left"
-  });
-
-  game.settings.register(MODULE_ID, "undoButton", {
-    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoButton.Name"),
-    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoButton.Hint"),
-    scope: "world",
-    config: true,
-    type: String,
-    choices: {
-      disabled: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Disabled"),
-      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Left"),
-      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Middle"),
-      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Right")
-    },
-    default: "middle"
-  });
-
   // Foundry registers keybindings during init, not ready.
   game.keybindings.register(MODULE_ID, "startCapture", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCapture"),
@@ -72,6 +43,15 @@ Hooks.once("init", () => {
       void FromSceneToTile.start();
       return true;
     },
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "addVertex", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.AddVertex"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.AddVertexHint"),
+    editable: [{ key: "KeyV" }],
+    onDown: () => FromSceneToTile.addVertexActive(),
     restricted: true,
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
   });
@@ -107,6 +87,12 @@ Hooks.once("init", () => {
 class FromSceneToTile {
   static active = false;
   static session = null;
+
+  static addVertexActive() {
+    if (!this.session) return false;
+    this.session.addVertex();
+    return true;
+  }
 
   static finishActive() {
     if (!this.session) return false;
@@ -202,6 +188,7 @@ class FromSceneToTile {
     const view = canvas.app.view;
     const points = [];
     let cursor = null;
+    let cursorScene = null;
     let destroyed = false;
     let lastLeftClick = null;
 
@@ -305,29 +292,24 @@ class FromSceneToTile {
       else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
     };
 
-    this.session = { finish, cancel, undo };
+    const addVertex = () => {
+      if (destroyed || !cursor || !cursorScene) return;
+      points.push({
+        screen: { ...cursor },
+        scene: { ...cursorScene }
+      });
+      redraw();
+    };
 
-    const mouseButtonCode = (name) => ({ left: 0, middle: 1, right: 2 })[name];
+    this.session = { finish, cancel, undo, addVertex };
+
     const onPointerDown = (event) => {
-      if (destroyed) return;
-      const vertexButton = game.settings.get(MODULE_ID, "vertexButton") || "left";
-      const undoButton = game.settings.get(MODULE_ID, "undoButton") || "middle";
-      const isVertexButton = event.button === mouseButtonCode(vertexButton);
-      const isUndoButton = undoButton !== "disabled" && event.button === mouseButtonCode(undoButton);
+      if (destroyed || event.button !== 0) return;
 
-      // Preserve native right-button panning unless the right button is
-      // deliberately assigned to a module action in settings.
-      if (!isVertexButton && !isUndoButton) return;
-
+      // Left click adds a vertex; right-click remains available for panning.
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      if (isUndoButton) {
-        undo();
-        return;
-      }
-
-      // A double click on the configured vertex button confirms the polygon.
       const now = Date.now();
       const isDoubleClick = lastLeftClick
         && now - lastLeftClick.time <= 400
@@ -342,22 +324,17 @@ class FromSceneToTile {
         return;
       }
 
-      lastLeftClick = {
-        time: now,
-        x: event.clientX,
-        y: event.clientY
-      };
-
-      const screen = { x: event.clientX, y: event.clientY };
-      const scenePoint = toScene(event);
-      points.push({ screen, scene: scenePoint });
-      cursor = screen;
+      lastLeftClick = { time: now, x: event.clientX, y: event.clientY };
+      cursor = { x: event.clientX, y: event.clientY };
+      cursorScene = toScene(event);
+      points.push({ screen: { ...cursor }, scene: { ...cursorScene } });
       redraw();
     };
 
     const onPointerMove = (event) => {
       if (destroyed) return;
       cursor = { x: event.clientX, y: event.clientY };
+      cursorScene = toScene(event);
       redraw();
     };
 
