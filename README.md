@@ -1,16 +1,20 @@
 # From Scene to Tile
 
-A Foundry Virtual Tabletop module for capturing a free-form polygon from a scene's background image and creating a transparent Tile from the selected region.
+A simple module that let you create Tiles direct from a selected area in your viewed scene.
 
-## Goals
+## How to Use
 
-- Support Foundry VTT v13 and v14.
-- Select a polygon by placing free-form vertices on the canvas.
-- Preview the polygon and edit the selection before committing.
-- Export the background image inside the polygon as a transparent PNG.
-- Upload the image using Foundry's FilePicker API and create a Tile aligned to the selection.
-- Provide graceful cancellation, validation, errors, and localization.
-- Avoid capturing tokens, lighting, walls, or other rendered canvas objects; the source is the scene background image only.
+- Go to the scene you want to make a tile based on.
+- CTRL + SHIFT + T to start selection. You still can move around the scene with Right Mouse during the selection.
+- Click Left Mouse to add points.
+- Double Click Left Mouse or Enter finish and create your tile.
+- Middle Mouse Click remove a point.
+- Backspace cancel the selection without creating a tile.
+
+## Game Settings
+
+### Tiles Directory
+Path for where the images created by this module will go.
 
 ## Status
 
