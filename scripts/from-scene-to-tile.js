@@ -50,16 +50,42 @@ Hooks.once("init", () => {
       }
     });
 
+    // Keep the folder button beside the path field, not on a separate row.
+    const wrapper = document.createElement("div");
+    wrapper.className = "from-scene-to-tile-folder-picker";
+    Object.assign(wrapper.style, {
+      display: "flex",
+      alignItems: "stretch",
+      gap: "0.35rem",
+      width: "100%"
+    });
+
+    const parent = setting.parentElement;
+    parent.insertBefore(wrapper, setting);
+    wrapper.appendChild(setting);
+    Object.assign(setting.style, {
+      flex: "1 1 auto",
+      minWidth: "0",
+      width: "auto"
+    });
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "file-picker";
     button.innerHTML = '<i class="fas fa-folder-open"></i>';
     button.title = game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFolder.PickerHint");
+    Object.assign(button.style, {
+      flex: "0 0 2.5rem",
+      width: "2.5rem",
+      minWidth: "2.5rem",
+      margin: "0",
+      padding: "0"
+    });
     button.addEventListener("click", event => {
       event.preventDefault();
       void chooseFolder();
     });
-    setting.insertAdjacentElement("afterend", button);
+    wrapper.appendChild(button);
   });
 
   game.settings.register(MODULE_ID, "outputFormat", {
