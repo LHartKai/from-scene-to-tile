@@ -27,11 +27,11 @@
         "WebP": "WebP"
       },
       "VertexMouseButton": {
-        "Name": "Botão do mouse para adicionar vértices",
+        "Name": "Controles do mouse — adicionar vértices",
         "Hint": "Escolha qual botão do mouse adiciona vértices durante o recorte."
       },
       "FinishMouseButton": {
-        "Name": "Botão do mouse para concluir",
+        "Name": "Controles do mouse — concluir seleção",
         "Hint": "Dê dois cliques com este botão para concluir o polígono."
       },
       "MouseButton": {
@@ -40,8 +40,11 @@
         "Right": "Direito"
       },
       "UndoMouseButton": {
-        "Name": "Botão do mouse para remover vértice",
+        "Name": "Controles do mouse — remover vértice",
         "Hint": "Clique para remover o último vértice adicionado durante o recorte."
+      },
+      "MouseControls": {
+        "Name": "Controles do mouse"
       }
     },
     "Messages": {
