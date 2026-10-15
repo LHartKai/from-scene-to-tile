@@ -4,6 +4,8 @@
     "Controls": {
       "StartCapture": "Capture Background Polygon as Tile",
       "StartCaptureHint": "Draw a free-form polygon over the scene background, then create a transparent Tile.",
+      "AddVertex": "Add polygon vertex at cursor",
+      "AddVertexHint": "Add a vertex at the current cursor position while capture is active.",
       "FinishCapture": "Finish polygon capture",
       "FinishCaptureHint": "Create a Tile from the current polygon selection.",
       "CancelCapture": "Cancel polygon capture",
@@ -23,23 +25,9 @@
         "PNG": "PNG",
         "WebP": "WebP"
       },
-      "VertexButton": {
-        "Name": "Mouse button to add vertices",
-        "Hint": "Choose which mouse button adds polygon vertices. Double-click that button to finish."
-      },
-      "UndoButton": {
-        "Name": "Mouse button to remove the last vertex",
-        "Hint": "Choose a different button from the vertex button, or disable mouse undo."
-      },
-      "MouseButtons": {
-        "Left": "Left mouse button",
-        "Middle": "Middle mouse button",
-        "Right": "Right mouse button",
-        "Disabled": "Disabled"
-      }
     },
     "Messages": {
-      "Instructions": "Use your configured mouse button to add vertices; double-click it to finish. Keyboard shortcuts can be changed in Configure Controls. The right mouse button pans the canvas by default.",
+      "Instructions": "Left-click to add vertices and double-click to finish. Keyboard shortcuts can be changed in Configure Controls; right-click pans the canvas.",
       "Cancelled": "Polygon capture cancelled.",
       "Success": "Transparent image uploaded and Tile created."
     },
