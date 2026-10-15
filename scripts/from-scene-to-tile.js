@@ -31,11 +31,39 @@ Hooks.once("init", () => {
     },
     default: "png"
   });
+  game.settings.register(MODULE_ID, "vertexMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "left"
+  });
+
+  game.settings.register(MODULE_ID, "finishMouseButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.FinishMouseButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButton.Right")
+    },
+    default: "left"
+  });
+
   // Foundry registers keybindings during init, not ready.
   game.keybindings.register(MODULE_ID, "startCapture", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCapture"),
     hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCaptureHint"),
-    editable: [{ key: "KeyT", modifiers: ["CONTROL", "SHIFT"] }],
+    editable: [{ key: "KeyT", modifiers: ["SHIFT", "CONTROL"] }],
     onDown: () => {
       if (!game.user.isGM) {
         ui.notifications.warn(game.i18n.localize("FROM_SCENE_TO_TILE.Errors.GMOnly"));
@@ -304,15 +332,23 @@ class FromSceneToTile {
 
     this.session = { finish, cancel, undo, addVertex };
 
-    const onPointerDown = (event) => {
-      if (destroyed || event.button !== 0) return;
+    const mouseButtonCode = (button) => ({ left: 0, middle: 1, right: 2 })[button] ?? 0;
 
-      // Left click adds a vertex; right-click remains available for panning.
+    const onPointerDown = (event) => {
+      if (destroyed) return;
+
+      const vertexButton = mouseButtonCode(game.settings.get(MODULE_ID, "vertexMouseButton"));
+      const finishButton = mouseButtonCode(game.settings.get(MODULE_ID, "finishMouseButton"));
+      const isVertexButton = event.button === vertexButton;
+      const isFinishButton = event.button === finishButton;
+      if (!isVertexButton && !isFinishButton) return;
+
       event.preventDefault();
       event.stopImmediatePropagation();
 
       const now = Date.now();
-      const isDoubleClick = lastLeftClick
+      const isDoubleClick = isFinishButton && lastLeftClick
+        && lastLeftClick.button === event.button
         && now - lastLeftClick.time <= 400
         && Math.hypot(
           event.clientX - lastLeftClick.x,
@@ -325,11 +361,13 @@ class FromSceneToTile {
         return;
       }
 
-      lastLeftClick = { time: now, x: event.clientX, y: event.clientY };
+      lastLeftClick = { time: now, x: event.clientX, y: event.clientY, button: event.button };
       cursor = { x: event.clientX, y: event.clientY };
       cursorScene = toScene(event);
-      points.push({ screen: { ...cursor }, scene: { ...cursorScene } });
-      redraw();
+      if (isVertexButton) {
+        points.push({ screen: { ...cursor }, scene: { ...cursorScene } });
+        redraw();
+      }
     };
 
     const onPointerMove = (event) => {
