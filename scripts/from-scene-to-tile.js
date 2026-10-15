@@ -74,6 +74,8 @@ Hooks.once("init", () => {
     },
     default: "png"
   });
+  // Mouse actions are configured here because Foundry's public keybinding
+  // API does not expose mouse-button bindings in Configure Controls.
   game.settings.register(MODULE_ID, "vertexMouseButton", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Name"),
     hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexMouseButton.Hint"),
