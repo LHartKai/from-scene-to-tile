@@ -17,9 +17,8 @@ Hooks.once("init", () => {
     type: String,
     default: `worlds/${game.world.id}/from-scene-to-tile`
   });
-});
 
-Hooks.once("ready", () => {
+  // Foundry registers keybindings during init, not ready.
   game.keybindings.register(MODULE_ID, "startCapture", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCapture"),
     hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCaptureHint"),
