@@ -18,6 +18,19 @@ Hooks.once("init", () => {
     default: `worlds/${game.world.id}/from-scene-to-tile`
   });
 
+  game.settings.register(MODULE_ID, "outputFormat", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      png: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.PNG"),
+      webp: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.OutputFormat.WebP")
+    },
+    default: "png"
+  });
+
   // Foundry registers keybindings during init, not ready.
   game.keybindings.register(MODULE_ID, "startCapture", {
     name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.StartCapture"),
@@ -337,12 +350,23 @@ class FromSceneToTile {
         context.clip();
         context.drawImage(background.source, minX, minY, width, height, 0, 0, width, height);
 
+        const requestedFormat = game.settings.get(MODULE_ID, "outputFormat") === "webp"
+          ? "webp"
+          : "png";
+        const requestedMimeType = requestedFormat === "webp" ? "image/webp" : "image/png";
         const blob = await new Promise((resolve, reject) => {
           output.toBlob(result => {
             if (result) resolve(result);
             else reject(new Error(FromSceneToTile.localize("Errors.ExportFailed")));
-          }, "image/png");
+          }, requestedMimeType);
         });
+
+        // Some browsers may fall back to PNG when WebP encoding is unavailable.
+        // Use the actual MIME type returned by the browser for the filename.
+        const actualFormat = blob.type === "image/webp" ? "webp" : "png";
+        if (requestedFormat === "webp" && actualFormat !== "webp") {
+          console.warn(`[${MODULE_ID}] WebP encoding unavailable; the browser exported PNG instead.`);
+        }
 
         const folder = String(game.settings.get(MODULE_ID, "outputFolder") || "")
           .trim().replace(/^\/+|\/+$/g, "");
@@ -356,7 +380,7 @@ class FromSceneToTile {
           console.debug(`[${MODULE_ID}] Directory creation skipped/failed`, error);
         }
 
-        const file = new File([blob], `polygon-${Date.now()}.png`, { type: "image/png" });
+        const file = new File([blob], `polygon-${Date.now()}.${actualFormat}`, { type: blob.type || "image/png" });
         let uploaded;
         try {
           uploaded = await FilePicker.upload("data", folder, file, {}, {});
