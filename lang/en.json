@@ -24,10 +24,23 @@
         "Hint": "Choose the file format used for newly created Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
+      },
+      "VertexMouseButton": {
+        "Name": "Mouse button to add vertices",
+        "Hint": "Choose which mouse button adds vertices during polygon capture."
+      },
+      "FinishMouseButton": {
+        "Name": "Mouse button to finish capture",
+        "Hint": "Double-click this button to finish the polygon."
+      },
+      "MouseButton": {
+        "Left": "Left",
+        "Middle": "Middle",
+        "Right": "Right"
       }
     },
     "Messages": {
-      "Instructions": "Left-click to add vertices and double-click to finish. Keyboard shortcuts can be changed in Configure Controls; right-click pans the canvas.",
+      "Instructions": "Use the configured mouse button to add vertices and double-click the configured finish button to complete the polygon. Keyboard shortcuts can be changed in Configure Controls.",
       "Cancelled": "Polygon capture cancelled.",
       "Success": "Transparent image uploaded and Tile created."
     },
