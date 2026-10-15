@@ -30,6 +30,34 @@ Hooks.once("init", () => {
     },
     default: "png"
   });
+  game.settings.register(MODULE_ID, "vertexButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.VertexButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Right")
+    },
+    default: "left"
+  });
+
+  game.settings.register(MODULE_ID, "undoButton", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoButton.Name"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.UndoButton.Hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      disabled: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Disabled"),
+      left: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Left"),
+      middle: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Middle"),
+      right: game.i18n.localize("FROM_SCENE_TO_TILE.Settings.MouseButtons.Right")
+    },
+    default: "middle"
+  });
 
   // Foundry registers keybindings during init, not ready.
   game.keybindings.register(MODULE_ID, "startCapture", {
@@ -47,10 +75,56 @@ Hooks.once("init", () => {
     restricted: true,
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
   });
+
+  game.keybindings.register(MODULE_ID, "finishCapture", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.FinishCapture"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.FinishCaptureHint"),
+    editable: [{ key: "Enter" }],
+    onDown: () => FromSceneToTile.finishActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "cancelCapture", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.CancelCapture"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.CancelCaptureHint"),
+    editable: [{ key: "Backspace" }],
+    onDown: () => FromSceneToTile.cancelActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
+
+  game.keybindings.register(MODULE_ID, "undoVertex", {
+    name: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.UndoVertex"),
+    hint: game.i18n.localize("FROM_SCENE_TO_TILE.Controls.UndoVertexHint"),
+    editable: [{ key: "KeyZ", modifiers: ["CONTROL"] }],
+    onDown: () => FromSceneToTile.undoActive(),
+    restricted: true,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL
+  });
 });
 
 class FromSceneToTile {
   static active = false;
+  static session = null;
+
+  static finishActive() {
+    if (!this.session) return false;
+    this.session.finish();
+    return true;
+  }
+
+  static cancelActive() {
+    if (!this.session) return false;
+    this.session.cancel();
+    return true;
+  }
+
+  static undoActive() {
+    if (!this.session) return false;
+    this.session.undo();
+    return true;
+  }
 
   static localize(key) {
     return game.i18n.localize(`FROM_SCENE_TO_TILE.${key}`);
@@ -170,13 +244,13 @@ class FromSceneToTile {
       destroyed = true;
       view.removeEventListener("pointerdown", onPointerDown, true);
       window.removeEventListener("pointermove", onPointerMove, true);
-      window.removeEventListener("keydown", onKeyDown, true);
       window.removeEventListener("contextmenu", onContextMenu, true);
       window.removeEventListener("wheel", onViewportChange, true);
       window.removeEventListener("resize", onViewportChange, true);
       view.style.cursor = "";
       overlay.remove();
       this.active = false;
+      this.session = null;
     };
 
     const toScene = (event) => canvas.canvasCoordinatesFromClient({
@@ -220,27 +294,40 @@ class FromSceneToTile {
       this.notify("Messages.Cancelled");
     };
 
+    const undo = () => {
+      if (destroyed || !points.length) return;
+      points.pop();
+      redraw();
+    };
+
+    const finish = () => {
+      if (points.length >= 3) void complete();
+      else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
+    };
+
+    this.session = { finish, cancel, undo };
+
+    const mouseButtonCode = (name) => ({ left: 0, middle: 1, right: 2 })[name];
     const onPointerDown = (event) => {
       if (destroyed) return;
+      const vertexButton = game.settings.get(MODULE_ID, "vertexButton") || "left";
+      const undoButton = game.settings.get(MODULE_ID, "undoButton") || "middle";
+      const isVertexButton = event.button === mouseButtonCode(vertexButton);
+      const isUndoButton = undoButton !== "disabled" && event.button === mouseButtonCode(undoButton);
 
-      // Middle mouse removes the most recently added vertex.
-      if (event.button === 1) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        if (points.length) {
-          points.pop();
-          redraw();
-        }
-        return;
-      }
-      if (event.button !== 0) return;
+      // Preserve native right-button panning unless the right button is
+      // deliberately assigned to a module action in settings.
+      if (!isVertexButton && !isUndoButton) return;
 
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      // Detect the second left click ourselves instead of relying on
-      // PointerEvent.detail, which may be altered by Foundry's canvas handlers.
-      // The two clicks must be close in both time and screen position.
+      if (isUndoButton) {
+        undo();
+        return;
+      }
+
+      // A double click on the configured vertex button confirms the polygon.
       const now = Date.now();
       const isDoubleClick = lastLeftClick
         && now - lastLeftClick.time <= 400
@@ -251,8 +338,7 @@ class FromSceneToTile {
 
       if (isDoubleClick) {
         lastLeftClick = null;
-        if (points.length >= 3) void complete();
-        else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
+        finish();
         return;
       }
 
@@ -273,18 +359,6 @@ class FromSceneToTile {
       if (destroyed) return;
       cursor = { x: event.clientX, y: event.clientY };
       redraw();
-    };
-
-    const onKeyDown = (event) => {
-      if (destroyed) return;
-      if (event.key === "Backspace") {
-        event.preventDefault();
-        cancel();
-      } else if (event.key === "Enter") {
-        event.preventDefault();
-        if (points.length >= 3) void complete();
-        else ui.notifications.warn(this.localize("Errors.NeedThreePoints"));
-      }
     };
 
     const onContextMenu = (event) => {
@@ -418,7 +492,6 @@ class FromSceneToTile {
     view.style.cursor = "crosshair";
     view.addEventListener("pointerdown", onPointerDown, true);
     window.addEventListener("pointermove", onPointerMove, true);
-    window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("contextmenu", onContextMenu, true);
     window.addEventListener("wheel", onViewportChange, true);
     window.addEventListener("resize", onViewportChange, true);
