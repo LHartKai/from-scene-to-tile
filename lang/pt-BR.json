@@ -24,7 +24,7 @@
         "Hint": "Escolha o formato dos arquivos usados nos novos Tiles.",
         "PNG": "PNG",
         "WebP": "WebP"
-      },
+      }
     },
     "Messages": {
       "Instructions": "Clique com o botão esquerdo para adicionar vértices e dê dois cliques para concluir. Os atalhos podem ser alterados em Configurar controles; o botão direito movimenta o canvas.",
