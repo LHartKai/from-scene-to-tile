@@ -1,0 +1,38 @@
+{
+  "FROM_SCENE_TO_TILE": {
+    "Title": "From Scene to Tile",
+    "Controls": {
+      "StartCapture": "Recortar polígono do fundo como Tile",
+      "StartCaptureHint": "Desenhe um polígono livre sobre o fundo da cena para criar um Tile transparente.",
+      "Open": "Iniciar recorte"
+    },
+    "Settings": {
+      "OutputFolder": {
+        "Name": "Pasta de destino",
+        "Hint": "Pasta relativa à origem de arquivos onde os PNGs gerados serão enviados."
+      }
+    },
+    "Messages": {
+      "Instructions": "Clique para adicionar vértices. Clique no primeiro ponto, pressione Enter ou clique com o botão direito para concluir. Backspace remove um ponto; Esc cancela.",
+      "Cancelled": "Recorte poligonal cancelado.",
+      "Success": "PNG transparente enviado e Tile criado."
+    },
+    "Errors": {
+      "GMOnly": "Somente um Mestre pode usar esta ferramenta.",
+      "NoScene": "Nenhuma cena ativa está pronta.",
+      "NoBackground": "Não foi possível acessar a imagem de fundo da cena ativa.",
+      "UnsupportedTransform": "Fundos rotacionados ou inclinados ainda não são suportados.",
+      "InvalidDimensions": "O fundo possui dimensões inválidas.",
+      "AlreadyActive": "Já existe um recorte poligonal em andamento.",
+      "NeedThreePoints": "Adicione pelo menos três pontos para criar um polígono.",
+      "SceneChanged": "A cena ativa mudou durante a seleção.",
+      "BackgroundChanged": "O fundo da cena mudou durante a seleção.",
+      "SelectionOutsideBackground": "O polígono não intersecta a imagem de fundo.",
+      "CanvasUnavailable": "Não foi possível criar o canvas do recorte.",
+      "ExportFailed": "Não foi possível exportar o recorte em PNG. O navegador pode estar bloqueando o acesso à imagem.",
+      "OutputFolderEmpty": "Configure uma pasta de destino válida nas configurações do módulo.",
+      "UploadFailed": "O upload não retornou um caminho de arquivo utilizável.",
+      "Unexpected": "Ocorreu um erro inesperado ao criar o Tile."
+    }
+  }
+}
