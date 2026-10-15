@@ -1,6 +1,6 @@
 # From Scene to Tile
 
-A simple module that let you create Tiles direct from a selected area in your viewed scene. For now, it only captures things present on the background image; tokens, walls, lights, weather, and other rendered layers are excluded.
+Simple module that let you create Tiles direct from a selected area in your viewed scene. For now, it only captures things present on the background image; tokens, walls, lights, weather, and other rendered layers are excluded.
 
 ## How to Use
 
@@ -16,5 +16,5 @@ A simple module that let you create Tiles direct from a selected area in your vi
 ### Tiles Directory
 Path for where the images created by this module will go.
 
-### 
-Select if the module saves the images in PNG or Webp format. Changing this setting won't change the format from already existing images.
+### Format Selection
+Choose in wich format the module will save images: PNG or Webp. Changing this setting won't change the format from already existing images.
