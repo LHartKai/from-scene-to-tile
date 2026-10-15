@@ -27,11 +27,11 @@
         "WebP": "WebP"
       },
       "VertexMouseButton": {
-        "Name": "Mouse button to add vertices",
+        "Name": "Mouse Controls — add vertices",
         "Hint": "Choose which mouse button adds vertices during polygon capture."
       },
       "FinishMouseButton": {
-        "Name": "Mouse button to finish capture",
+        "Name": "Mouse Controls — finish selection",
         "Hint": "Double-click this button to finish the polygon."
       },
       "MouseButton": {
@@ -40,8 +40,11 @@
         "Right": "Right"
       },
       "UndoMouseButton": {
-        "Name": "Mouse button to undo vertex",
+        "Name": "Mouse Controls — undo vertex",
         "Hint": "Click to remove the most recently added vertex during capture."
+      },
+      "MouseControls": {
+        "Name": "Mouse Controls"
       }
     },
     "Messages": {
