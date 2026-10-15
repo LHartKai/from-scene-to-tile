@@ -4,6 +4,8 @@
     "Controls": {
       "StartCapture": "Recortar polígono do fundo como Tile",
       "StartCaptureHint": "Desenhe um polígono livre sobre o fundo da cena para criar um Tile transparente.",
+      "AddVertex": "Adicionar vértice na posição do cursor",
+      "AddVertexHint": "Adicionar um vértice na posição atual do cursor durante o recorte.",
       "FinishCapture": "Concluir recorte poligonal",
       "FinishCaptureHint": "Criar um Tile a partir do polígono selecionado.",
       "CancelCapture": "Cancelar recorte poligonal",
@@ -23,23 +25,9 @@
         "PNG": "PNG",
         "WebP": "WebP"
       },
-      "VertexButton": {
-        "Name": "Botão do mouse para adicionar vértices",
-        "Hint": "Escolha qual botão adiciona vértices. Um duplo clique nesse botão conclui o polígono."
-      },
-      "UndoButton": {
-        "Name": "Botão do mouse para remover o último vértice",
-        "Hint": "Escolha um botão diferente do usado para adicionar vértices ou desative essa ação pelo mouse."
-      },
-      "MouseButtons": {
-        "Left": "Botão esquerdo",
-        "Middle": "Botão do meio",
-        "Right": "Botão direito",
-        "Disabled": "Desativado"
-      }
     },
     "Messages": {
-      "Instructions": "Use o botão do mouse configurado para adicionar vértices; dê dois cliques nele para concluir. Os atalhos de teclado podem ser alterados em Configurar controles. Por padrão, o botão direito movimenta o canvas.",
+      "Instructions": "Clique com o botão esquerdo para adicionar vértices e dê dois cliques para concluir. Os atalhos podem ser alterados em Configurar controles; o botão direito movimenta o canvas.",
       "Cancelled": "Recorte poligonal cancelado.",
       "Success": "Imagem transparente enviada e Tile criado."
     },
