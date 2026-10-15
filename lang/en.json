@@ -2,37 +2,37 @@
   "FROM_SCENE_TO_TILE": {
     "Title": "From Scene to Tile",
     "Controls": {
-      "StartCapture": "Capture Background Polygon as Tile",
-      "StartCaptureHint": "Draw a free-form polygon over the scene background, then create a transparent Tile.",
-      "AddVertex": "Add polygon vertex at cursor",
-      "AddVertexHint": "Add a vertex at the current cursor position while capture is active.",
-      "FinishCapture": "Finish polygon capture",
-      "FinishCaptureHint": "Create a Tile from the current polygon selection.",
-      "CancelCapture": "Cancel polygon capture",
-      "CancelCaptureHint": "Cancel the active polygon selection.",
-      "UndoVertex": "Remove last polygon vertex",
-      "UndoVertexHint": "Remove the most recently added polygon vertex.",
+      "StartCapture": "Start Selection",
+      "StartCaptureHint": "Starts the area selection.",
+      "AddVertex": "Add New Point",
+      "AddVertexHint": "Creates a new point at the current cursor position.",
+      "FinishCapture": "Finish Selection",
+      "FinishCaptureHint": "Create a Tile from the current selected area.",
+      "CancelCapture": "Cancel Selection",
+      "CancelCaptureHint": "Cancel the active selection without creating a tile or saving a image.",
+      "UndoVertex": "Remove Last Point",
+      "UndoVertexHint": "Undo the last created point.",
       "Open": "Start capture"
     },
     "Settings": {
       "OutputFolder": {
-        "Name": "Output folder",
-        "Hint": "Choose the destination folder using Foundry's file picker. Generated images will be saved there.",
+        "Name": "Created images directory",
+        "Hint": "Choose the destination folder where all tiles images created with this module will go.",
         "PickerHint": "Open the folder browser to choose the destination."
       },
       "OutputFormat": {
-        "Name": "Output image format",
-        "Hint": "Choose the file format used for newly created Tiles.",
+        "Name": "Image format",
+        "Hint": "Choose the file format used for newly created Tiles. Changing this setting won't affect already existing images.",
         "PNG": "PNG",
         "WebP": "WebP"
       },
       "VertexMouseButton": {
-        "Name": "Mouse Controls — add vertices",
-        "Hint": "Choose which mouse button adds vertices during polygon capture."
+        "Name": "Add New Point",
+        "Hint": "Creates a new point at the current cursor position."
       },
       "FinishMouseButton": {
-        "Name": "Mouse Controls — finish selection",
-        "Hint": "Double-click this button to finish the polygon."
+        "Name": "Finish Selection",
+        "Hint": "Double-click this button to finish the selection."
       },
       "MouseButton": {
         "Left": "Left",
@@ -40,17 +40,17 @@
         "Right": "Right"
       },
       "UndoMouseButton": {
-        "Name": "Mouse Controls — undo vertex",
-        "Hint": "Click to remove the most recently added vertex during capture."
+        "Name": "Remove Last Point",
+        "Hint": "Undo the last created point."
       },
       "MouseControls": {
         "Name": "Mouse Controls"
       }
     },
     "Messages": {
-      "Instructions": "Use the configured mouse button to add vertices and double-click the configured finish button to complete the polygon. Keyboard shortcuts can be changed in Configure Controls.",
-      "Cancelled": "Polygon capture cancelled.",
-      "Success": "Transparent image uploaded and Tile created."
+      "Instructions": "Selection Active",
+      "Cancelled": "Selection Cancelled.",
+      "Success": "Tile Created."
     },
     "Errors": {
       "GMOnly": "Only a GM can use this tool.",
@@ -58,15 +58,15 @@
       "NoBackground": "Could not access the active scene background image.",
       "UnsupportedTransform": "Rotated or skewed scene backgrounds are not supported yet.",
       "InvalidDimensions": "The background has invalid dimensions.",
-      "AlreadyActive": "A polygon capture is already active.",
-      "NeedThreePoints": "Add at least three points to create a polygon.",
+      "AlreadyActive": "Selection already active.",
+      "NeedThreePoints": "You need atleast three points to create a tile.",
       "SceneChanged": "The active scene changed during selection.",
       "BackgroundChanged": "The scene background changed during selection.",
-      "SelectionOutsideBackground": "The polygon does not intersect the background image.",
+      "SelectionOutsideBackground": "The selection does not intersect the background image.",
       "CanvasUnavailable": "Could not create a canvas for the crop.",
-      "ExportFailed": "Could not export the crop as PNG. The image may be blocked by browser security restrictions.",
-      "OutputFolderEmpty": "Choose a valid output folder in module settings.",
-      "UploadFailed": "The upload did not return a usable file path.",
+      "ExportFailed": "Could not export the crop. The image may be blocked by browser security restrictions.",
+      "OutputFolderEmpty": "Choose a valid directory folder in module settings.",
+      "UploadFailed": "Upload did not return a usable file path.",
       "Unexpected": "An unexpected error occurred while creating the Tile."
     }
   }
